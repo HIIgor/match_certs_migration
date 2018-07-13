@@ -13,11 +13,11 @@ In your Fastfile
 # username -> developer account username
 # app_identifier -> app bundle_identifier
 # type -> cert type ('development', 'appstore', 'enterprise', 'adhoc', 'distribution')
-existing_certs_migration(	
-	git_url: git_url,
-	username: username,
-	app_identifier: app_identifier,
-	type: type,
+match_certs_migration(	
+  git_url: git_url,
+  username: username,
+  app_identifier: app_identifier,
+  type: type,
 )
 
 ```
