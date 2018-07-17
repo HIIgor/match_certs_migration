@@ -13,7 +13,7 @@ module Fastlane
         require 'fileutils'
 
         # fastlane will take care of reading in the parameter and fetching the environment variable:
-        UI.message "Action: exsiting_certs_migration Params: username => #{params[:username]} app_identifier => #{params[:app_identifier]}  type => #{params[:type]}"
+        UI.message "Action: match_certs_migration Params: username => #{params[:username]} app_identifier => #{params[:app_identifier]}  type => #{params[:type]}"
 
         Spaceship.login(params[:username])
         Spaceship.select_team
@@ -27,23 +27,37 @@ module Fastlane
         remote_branches = `git branch -a`.split("\n")
         remote_branches.each {|branch| 
           if branch.include?(dest_branch_name)
-            UI.success ("👏👏👏 Your certificate are under the gitlab, next it will execute the match...."); return
+            UI.important ("Your certificate are under the gitlab, there is no need to migration, maybe you should match immediately");
+            return
           end
         }
-        
- 
-        matched_cert_id = remote_matched_cert_id(cert_type(params[:type]))
 
-        Dir.foreach(all_certs_dir) do |file|
-          if file !="." and file !=".."
-            cert_id = file.split('.')[0]
-            if matched_cert_id == cert_id
-              UI.success "😁😁😁 The certificate that can be reused is found, cert_id => #{cert_id}"; break;
-            end
-          end
+        matched_cert_id = nil
+        remote_cert_ids = remote_cert_ids(cert_type(params[:type]))
+        if remote_cert_ids.length == 0
+          UI.user_error "There are maybe not suitable certificates matched remotely, or all of the certificates will expire after a month"
         end
 
-        UI.success "💔💔💔 The certificate of type: #{params[:type]} can not be found or The certificate is going to expire, the next step: Match will create a new one for you..." && return unless matched_cert_id != nil
+        remote_cert_ids.each { |remote_cert_id|
+
+          Dir.foreach(all_certs_dir) do |file|
+            if file !="." and file !=".."
+              cert_id = file.split('.')[0]
+              if remote_cert_id == cert_id
+                matched_cert_id = cert_id
+                UI.success "😁😁😁 The available certificate has been found, cert_id => #{cert_id}";
+                break;
+              end
+            end
+          end
+        }
+          
+        if matched_cert_id == nil
+          UI.success "💔💔💔 A certificate of #{params[:type]} is not found or the certificate is about to expire, you can use match create a new one..."
+          
+          return
+        end
+        
 
         cp_certs(current_git_dir, all_certs_dir, params[:type], dest_branch_name, matched_cert_id)
 
@@ -89,7 +103,7 @@ module Fastlane
       # return cert type with type
       def self.cert_type(type) 
         cert_type = "Development" if type == "development"
-        cert_type = "Inhouse"     if type == "enterprise"
+        cert_type = "InHouse"     if type == "enterprise"
         cert_type = "Production"  if ["adhoc", "appstore", "distribution"].include?(type)
 
         return cert_type
@@ -132,18 +146,18 @@ module Fastlane
 
 
       # get remote cert_id according to apple_id and cert_type, and the cert cannot be expired after a month in additional
-      def self.remote_matched_cert_id(type)
-        cert_id = nil
-
+      def self.remote_cert_ids(type)
+        cert_ids = []
         Spaceship.certificate.all.each do |cert|
           cert_type = Spaceship::Portal::Certificate::CERTIFICATE_TYPE_IDS[cert.type_display_id].to_s.split("::")[-1]
           if cert_type == type && cert.expires - Time.now > 3600 * 24 * 30
-            cert_id = cert.id; break
+            cert_ids << cert.id
           end
           
         end
 
-        return cert_id
+        UI.message "cert_ids = #{cert_ids}"
+        return cert_ids
       end
 
       #####################################################
@@ -151,7 +165,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "migration an existing certificate on developer.apple.com to prevent from recreating a new certificate by match"
+        "migration an existing certificate on developer.apple.com to avoid match recreating a new certificate for you"
       end
 
       def self.details
@@ -189,7 +203,7 @@ module Fastlane
                                        end),
           FastlaneCore::ConfigItem.new(key: :app_identifier,
                                        env_name: "FL_MATCH_CERTS_MIGRATION_DEVELOPMENT",
-                                       description: "the certificate type you will verify",
+                                       description: "the project bundle identifier",
                                        is_string: false, # true: verifies the input is a string, false: every kind of value
                                        ),
         ]
