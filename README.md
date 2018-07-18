@@ -35,4 +35,4 @@ The action will check out all the branches and copy all the certs to a tmp dirct
 ### Notice
 When I was using the action, To make it easy, there were only README.md and match_version.txt in the directory of default branch master,thus all I need to do is copy the certs directory. The branch master directory was shown in the figure below.
 
-![avatar](/Users/hiigor/Test/match_certs_migration/screen_shot.jpeg)
+![image](https://github.com/HIIgor/match_certs_migration/blob/master/screen_shot.jpeg)
