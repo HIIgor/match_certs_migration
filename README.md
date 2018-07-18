@@ -28,11 +28,12 @@ In your Fastfile
 ```
 next you need to execute the match, since there's no provision file in the git repo, you should add  `--readonly false` when you execute the match. Match will fetch provisons for you, so the problem is solved.
 
-As match has stored the cert and p12 files on the git repo, and they are named with the cert_id,
+As match has stored the cert and p12 files in the git repo, and they are named with the cert_id,
 
 The action will check out all the branches and copy all the certs to a tmp dirctory, fetch all the certificates on the developer account and choose a suitable cert, get the cert and p12 files from the all certs tmp directory and then commit them to your cert git repo. That's it.
 
 ### Notice
-When I was using the action, To make it easy, there were only README.md and match_version.txt in the directory of default branch master,thus all I need to do is copy the certs directory. The branch master directory was shown in the figure below.
+When I used the action in my project. To make it easy, there were only README.md and match_version.txt in the directory of default branch master,thus all I need to do is copy the certs directory here and commit the changes.
+The branch master directory was shown in the figure below.
 
 ![image](https://github.com/HIIgor/match_certs_migration/blob/master/screen_shot.jpeg)
