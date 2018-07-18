@@ -1,7 +1,7 @@
 # match_certs_migration
 
 
-I used the match in our project. I find that the fastlane match will creat a new certificate for us if a new project is created, and the limitation of certificate count is 3. Actually there's no problem reusing the certificate of the same type, then using the match to generate different provisions for different bundle_identifier can perfectly solve the problem. and the fastlane action match_certs_migration is what you want.
+I used match in our project, and match regenerated the certificate when the project was created. The number of developer accounts is limited to three, and in fact the same type of certificate can be reused, then use the match to fetch different provision files. The fastlane action match_certs_migration will reuse the certificates. 
 
 ### Usage
 
