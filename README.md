@@ -37,3 +37,5 @@ When I used the action in my project. To make it easy, there were only README.md
 The branch master directory was shown in the figure below.
 
 ![image](https://github.com/HIIgor/match_certs_migration/blob/master/screen_shot.jpeg)
+
+You may have some problems with using it, you can modify the directory structure of the default branch as I did, and it would be better if you could fix it.
