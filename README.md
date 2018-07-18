@@ -13,6 +13,8 @@ In your Fastfile
 # username -> developer account username
 # app_identifier -> app bundle_identifier
 # type -> cert type ('development', 'appstore', 'enterprise', 'adhoc', 'distribution')
+
+
 match_certs_migration(	
   git_url: git_url,
   username: username,
@@ -21,7 +23,7 @@ match_certs_migration(
 )
 
 ```
-next you need to execute the match, match will not create a new certs if a reusable cert is found, after that match will fetch provision for you. cheers!!
+next you need to execute the match, since there's no provision file in the git repo, you should add  `--readonly false` when you execute the match. Match will fetch provisons for you, so the problem is solved.
 
 As match has stored the cert and p12 files on the git repo, and they are named with the cert_id,
 
