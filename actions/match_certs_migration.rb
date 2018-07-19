@@ -69,9 +69,17 @@ module Fastlane
       def self.cp_certs(current_git_dir, all_certs_dir, type, dest_branch_name, matched_id)
         # ensure your there are only README.md and match_version.txt
         git_command_executor("git checkout '.'")
-        git_command_executor("git checkout 'master' ")
+
         git_command_executor("git checkout -b #{dest_branch_name}")
 
+        # delete the existing certs & profiles directory
+        if File.exist?("#{current_git_dir}/certs")
+          FileUtils.rm_r("#{current_git_dir}/certs")
+        end
+
+        if File.exist?("#{current_git_dir}/profiles")
+          FileUtils.rm_r("#{current_git_dir}/profiles")
+        end
 
         certs_dir = "#{current_git_dir}/certs/#{type}"
         FileUtils.mkdir_p(certs_dir)
