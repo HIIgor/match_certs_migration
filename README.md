@@ -5,8 +5,8 @@ I used match in our project, and match regenerated the certificate when the proj
 
 ### Usage
 
-
-In your Fastfile 
+First of all, download the repo, drag the actions dir under your fastlane dir.
+In your Fastfile, 
 
 ```
 # git_url -> your certs repo git url
