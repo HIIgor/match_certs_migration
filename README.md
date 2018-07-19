@@ -32,13 +32,3 @@ As match has stored the cert and p12 files in the git repo, and they are named w
 
 The action will check out all the branches and copy all the certs to a tmp dirctory, fetch all the certificates on the developer account and choose a suitable cert, get the cert and p12 files from the all certs tmp directory and then commit them to your cert git repo. That's it.
 
-### Notice
-When I used the action in my project. To make it easy, there were only README.md and match_version.txt in the directory of default branch master,thus all I need to do is copy the certs directory here and commit the changes.
-
-You may have some problems with using it if your directory structure of the default branch is different from mine, you can modify the directory structure as I did, and it would be amazing if you could fix it.
-
-The directory structure of my default branch master is shown below.
-
-![image](https://github.com/HIIgor/match_certs_migration/blob/master/screen_shot.jpeg)
-
-
