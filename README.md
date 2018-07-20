@@ -28,7 +28,8 @@ In your Fastfile,
 ```
 next you need to execute the match, since there's no provision file in the git repo, you should add  `--readonly false` when you execute the match. Match will fetch provisons for you, so the problem is solved.
 
-As match has stored the cert and p12 files in the git repo, and they are named with the cert_id,
 
-The action will check out all the branches and copy all the certs to a tmp dirctory, fetch all the certificates on the developer account and choose a suitable cert, get the cert and p12 files from the all certs tmp directory and then commit them to your cert git repo. That's it.
+### Implementation
+As match has stored the cert and p12 files in the git repo, and they are named with the cert_id,
+the action will check out all the branches and copy all the certs to a tmp dirctory, fetch all the certificates on the developer account and choose a suitable cert, get the cert and p12 files from the all certs tmp directory and then commit them to your cert git repo. That's it.
 
