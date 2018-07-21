@@ -18,16 +18,19 @@ module Fastlane
         Spaceship.login(params[:username])
         Spaceship.select_team
 
-        all_certs_dir = Dir.mktmpdir
-        current_git_dir = Dir.mktmpdir
+        @all_certs_dir = Dir.mktmpdir
+        @current_git_dir = Dir.mktmpdir
 
-        get_all_certs(params[:git_url], all_certs_dir, current_git_dir)
+        UI.message "all_certs_disr -> #{@all_certs_dir}, current_git_dir -> #{@current_git_dir}"
+
+        get_all_certs(params[:git_url], @all_certs_dir, @current_git_dir)
 
         dest_branch_name = dest_remote_branch_name(params)
         remote_branches = `git branch -a`.split("\n")
         remote_branches.each {|branch| 
           if branch.include?(dest_branch_name)
             UI.important ("Your certificate are under the gitlab, there is no need to migration, maybe you should match immediately");
+            clear_dir
             return
           end
         }
@@ -36,11 +39,13 @@ module Fastlane
         remote_cert_ids = remote_cert_ids(cert_type(params[:type]))
         if remote_cert_ids.length == 0
           UI.user_error "There are maybe not suitable certificates matched remotely, or all of the certificates will expire after a month"
+          clear_dir
+          return
         end
 
         remote_cert_ids.each { |remote_cert_id|
 
-          Dir.foreach(all_certs_dir) do |file|
+          Dir.foreach(@all_certs_dir) do |file|
             if file !="." and file !=".."
               cert_id = file.split('.')[0]
               if remote_cert_id == cert_id
@@ -54,14 +59,16 @@ module Fastlane
           
         if matched_cert_id == nil
           UI.success "💔💔💔 A certificate of #{params[:type]} is not found or the certificate is about to expire, you can use match create a new one..."
-          
+          clear_dir
           return
         end
         
 
-        cp_certs(current_git_dir, all_certs_dir, params[:type], dest_branch_name, matched_cert_id)
+        cp_certs(@current_git_dir, @all_certs_dir, params[:type], dest_branch_name, matched_cert_id)
 
-        git_commit_changes(current_git_dir, params, dest_branch_name)
+        git_commit_changes(@current_git_dir, params, dest_branch_name)
+
+        clear_dir
       end
 
 
@@ -166,6 +173,11 @@ module Fastlane
 
         UI.message "cert_ids = #{cert_ids}"
         return cert_ids
+      end
+
+      def self.clear_dir
+        FileUtils.rm_rf(@all_certs_dir)
+        FileUtils.rm_rf(@current_git_dir)
       end
 
       #####################################################
