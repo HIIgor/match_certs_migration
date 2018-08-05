@@ -82,9 +82,8 @@ module Fastlane
         FileUtils.rm_r("#{current_git_dir}/certs") if File.exist?("#{current_git_dir}/certs")
         FileUtils.rm_r("#{current_git_dir}/profiles") if File.exist?("#{current_git_dir}/profiles")
 
-        certs_dir = "#{current_git_dir}/certs/#{type}"
+        certs_dir = File.join(current_git_dir, "certs", sub_dir_name(type), "")
         FileUtils.mkdir_p(certs_dir)
-
         FileUtils.cp_r(Dir.glob("#{all_certs_dir}/#{matched_id}.*"), certs_dir)
       end
 
@@ -116,6 +115,12 @@ module Fastlane
         cert_type = "Production"  if ["adhoc", "appstore", "distribution"].include?(type)
 
         return cert_type
+      end
+
+      def self.sub_dir_name(type)
+        cert_type = "development"   if type == "development"
+        cert_type = "enterprise"    if type == "enterprise"
+        cert_type = "distribution"  if ["adhoc", "appstore", "distribution"].include?(type)
       end
 
 
