@@ -21,7 +21,8 @@ module Fastlane
         @all_certs_dir = Dir.mktmpdir
         @current_git_dir = Dir.mktmpdir
 
-        UI.message "all_certs_disr -> #{@all_certs_dir}, current_git_dir -> #{@current_git_dir}"
+        UI.message "all_certs_disr -> #{@all_certs_dir}"
+        UI.message "current_git_dir -> #{@current_git_dir}"
 
         get_all_certs(params[:git_url], @all_certs_dir, @current_git_dir)
 
@@ -30,8 +31,7 @@ module Fastlane
         remote_branches.each {|branch| 
           if branch.include?(dest_branch_name)
             UI.important ("Your certificate are under the gitlab, there is no need to migration, maybe you should match immediately");
-            clear_dir
-            return
+            clear_dir; return
           end
         }
 
@@ -39,28 +39,27 @@ module Fastlane
         remote_cert_ids = remote_cert_ids(cert_type(params[:type]))
         if remote_cert_ids.length == 0
           UI.user_error "There are maybe not suitable certificates matched remotely, or all of the certificates will expire after a month"
-          clear_dir
-          return
+          clear_dir; return
+        else
+          UI.message "Certificate was found on the Developer Port, cert_ids => #{remote_cert_ids}"
         end
 
-        remote_cert_ids.each { |remote_cert_id|
-
-          Dir.foreach(@all_certs_dir) do |file|
-            if file !="." and file !=".."
-              cert_id = file.split('.')[0]
-              if remote_cert_id == cert_id
-                matched_cert_id = cert_id
-                UI.success "😁😁😁 The available certificate has been found, cert_id => #{cert_id}";
-                break;
+        catch :cert_id_found do
+          for remote_cert_id in remote_cert_ids do 
+            for file in Dir.entries(@all_certs_dir) do
+              if file !="." and file !=".."
+                cert_id = file.split('.')[0]
+                matched_cert_id = cert_id; throw :cert_id_found if remote_cert_id == cert_id
               end
             end
-          end
-        }
-          
+          end 
+        end
+
         if matched_cert_id == nil
           UI.success "💔💔💔 A certificate of #{params[:type]} is not found or the certificate is about to expire, you can use match create a new one..."
-          clear_dir
-          return
+          clear_dir; return
+        else
+          UI.success "😁😁😁 A certificate for migration has been found, cert_id: #{matched_cert_id}"
         end
         
 
@@ -80,13 +79,8 @@ module Fastlane
         git_command_executor("git checkout -b #{dest_branch_name}")
 
         # delete the existing certs & profiles directory
-        if File.exist?("#{current_git_dir}/certs")
-          FileUtils.rm_r("#{current_git_dir}/certs")
-        end
-
-        if File.exist?("#{current_git_dir}/profiles")
-          FileUtils.rm_r("#{current_git_dir}/profiles")
-        end
+        FileUtils.rm_r("#{current_git_dir}/certs") if File.exist?("#{current_git_dir}/certs")
+        FileUtils.rm_r("#{current_git_dir}/profiles") if File.exist?("#{current_git_dir}/profiles")
 
         certs_dir = "#{current_git_dir}/certs/#{type}"
         FileUtils.mkdir_p(certs_dir)
@@ -168,10 +162,8 @@ module Fastlane
           if cert_type == type && cert.expires - Time.now > 3600 * 24 * 30
             cert_ids << cert.id
           end
-          
         end
 
-        UI.message "cert_ids = #{cert_ids}"
         return cert_ids
       end
 
