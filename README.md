@@ -5,7 +5,7 @@ I used match in our project, and match regenerated the certificate when the proj
 
 ### Usage
 
-First of all, download the repo, drag the actions dir under your fastlane dir.
+First of all, download the repo, drag the actions directory under your fastlane directory.
 In your Fastfile, 
 
 ```
@@ -33,3 +33,5 @@ next you need to execute the match, since there's no provision file in the git r
 As match has stored the cert and p12 files in the git repo, and they are named with the cert_id,
 the action will check out all the branches and copy all the certs to a tmp dirctory, fetch all the certificates on the developer account and choose a suitable cert, get the cert and p12 files from the all certs tmp directory and then commit them to your cert git repo. That's it.
 
+### Todo
+Check that wether the cert alreadly exists in the git repo before fetch all the certs.
