@@ -118,9 +118,11 @@ module Fastlane
       end
 
       def self.sub_dir_name(type)
-        cert_type = "development"   if type == "development"
-        cert_type = "enterprise"    if type == "enterprise"
-        cert_type = "distribution"  if ["adhoc", "appstore", "distribution"].include?(type)
+        dir_name = "development"   if type == "development"
+        dir_name = "enterprise"    if type == "enterprise"
+        dir_name = "distribution"  if ["adhoc", "appstore", "distribution"].include?(type)
+
+        return dir_name
       end
 
 
