@@ -49,7 +49,7 @@ module Fastlane
             for file in Dir.entries(@all_certs_dir) do
               if file !="." and file !=".."
                 cert_id = file.split('.')[0]
-                matched_cert_id = cert_id; throw :cert_id_found if remote_cert_id == cert_id
+                (matched_cert_id = cert_id; throw :cert_id_found) if remote_cert_id == cert_id
               end
             end
           end 
