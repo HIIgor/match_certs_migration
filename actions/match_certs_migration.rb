@@ -99,8 +99,6 @@ module Fastlane
           git_command_executor("git checkout '.'")
           git_command_executor("git checkout #{branch}")
 
-          Match::Encrypt.new.decrypt_repo(path: current_git_dir, git_url: git_url, manual_password: nil)
-
           if File.exist?("#{current_git_dir}/certs")
             FileUtils.cp_r(Dir.glob("#{current_git_dir}/certs/**/*.cer"), all_certs_dir)
             FileUtils.cp_r(Dir.glob("#{current_git_dir}/certs/**/*.p12"), all_certs_dir)
@@ -118,11 +116,11 @@ module Fastlane
       end
 
       def self.sub_dir_name(type)
-        dir_name = "development"   if type == "development"
-        dir_name = "enterprise"    if type == "enterprise"
-        dir_name = "distribution"  if ["adhoc", "appstore", "distribution"].include?(type)
+        cert_type = "development"   if type == "development"
+        cert_type = "enterprise"    if type == "enterprise"
+        cert_type = "distribution"  if ["adhoc", "appstore", "distribution"].include?(type)
 
-        return dir_name
+        return cert_type
       end
 
 
@@ -151,7 +149,25 @@ module Fastlane
       # custom git commit message
       def self.git_commit_changes(current_git_dir, params, dest_branch_name)
         commit_message = ["[Update]", "certs_migration", "#{params[:type]}"].join(" ")
-        Match::GitHelper.commit_changes(current_git_dir, commit_message, params[:git_url], dest_branch_name)
+
+        Dir.chdir(current_git_dir) do
+          return if `git status`.include?("nothing to commit")
+
+          File.write("match_version.txt", Fastlane::VERSION) # unencrypted
+
+          commands = []
+          commands << "git add -A"
+          commands << "git commit -m #{commit_message.shellescape}"
+          commands << "GIT_TERMINAL_PROMPT=0 git push origin #{dest_branch_name.shellescape}"
+
+          UI.message "Pushing changes to remote git repo..."
+
+          commands.each do |command|
+            FastlaneCore::CommandExecutor.execute(command: command,
+                                                print_all: $verbose,
+                                            print_command: $verbose)
+          end
+        end
       end
 
 
