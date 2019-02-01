@@ -1,0 +1,96 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+# matched provisions are under ~/Library/MobileDevice/Provisioning Profiles
+# git repo phasepassword
+
+default_platform(:ios)
+
+file = File.read('./apps.json')
+apps = JSON.parse(file)
+app_names = apps.map { |app| app['app_name'] }
+app = nil
+
+platform :ios do
+  before_all do |lane, options|
+    if lane == :hi_match || lane == :hi_register_device || lane == :hi_match_certs_migration
+      app_name = UI.select(" select an app: ", app_names)
+      app = apps.find {|x| x['app_name'] == app_name}
+      if !app
+        UI.user_error!("Error when trying to find the application")
+      end
+
+      UI.success("Okay, The app you selected is: '#{app_name}'")
+    end
+
+    if lane == :hi_match_all
+      if apps.size.to_i == 0
+        UI.user_error!("Error,no app found in apps.json")
+      end
+    end
+    
+  end
+
+  desc "synchronous certificate \n fastlane ios hi_match"
+  lane :hi_match do |options|
+    readonly = true
+    readonly = false if options[:readonly] == false
+
+    match(
+      git_url: "git@github.com:HIIgor/fastlaneExampleCertificates.git",
+      git_branch: app["app_identifier"] + "." + app["type"],
+      type: app["type"],
+      username: app["username"],
+      team_id: app["team_id"],
+      app_identifier: app["app_identifier"],
+      readonly: readonly,
+      force_for_new_devices: options[:force],
+      keychain_password: options[:keychain_password],
+    )
+  end
+
+  desc "synchronous all \n e.g. fastlane ios hi_match_all readonly:1"
+  lane :hi_match_all do |options|
+    apps.each {|x| 
+      app = x
+      hi_match readonly: options[:readonly], force: options[:force]
+    }
+  end
+
+  desc "add device and refetch provision file \n e.g. fastlane ios hi_register_device"
+  lane :hi_register_device do |options|
+    UI.success("Okay, your lane option is '#{options}'")
+    register_device(
+      team_id: app["team_id"],
+      username: app["username"],
+      name: options[:name],
+      udid: options[:udid],
+    )
+
+    hi_match force:true, readonly:false
+
+  end
+
+  desc "migration existing certificate \n e.g. fastlane ios hi_match_certs_migration"
+  lane :hi_match_certs_migration do |options|
+    match_certs_migration(
+      git_url: "git@github.com:HIIgor/fastlaneExampleCertificates.git",
+      username: app["username"],
+      app_identifier: app["app_identifier"],
+      type: app["type"],
+    )
+    UI.success "👏👏👏 certificate migration success, now you con use hi_match to generate provisions \n e.g. fastlane ios hi_match readonly:false keychain_password:your_keychain_password"
+  end
+
+end

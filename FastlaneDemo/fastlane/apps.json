@@ -1,0 +1,20 @@
+[
+    {
+        "app_identifier": "com.hiigor.example.fastlane",
+        "app_name": "fastlaneExample",
+        "username": "luanhao1215@sina.com",
+        "user_id": "MengYa Chen",
+        "team_id": "B65A7Z4C43",
+        "type": "development",
+        "build_configuration": "Debug"
+    },
+    {
+        "app_identifier": "com.hiigor.chatchat",
+        "app_name": "chatchat",
+        "username": "luanhao1215@sina.com",
+        "user_id": "MengYa Chen",
+        "team_id": "B65A7Z4C43",
+        "type": "development",
+        "build_configuration": "Debug"
+    }
+]
