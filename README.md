@@ -4,8 +4,6 @@
 I used match in our project, and match regenerated the certificate when the project was created. The number of developer accounts is limited to three, and in fact the same type of certificate can be reused, then use the match to fetch different provision files. The fastlane action match_certs_migration will reuse the certificates. 
 
 ### Usage
-
-#### Example
  In the example, 
  ```
 fastlane hi_match_certs_migration
