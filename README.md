@@ -6,7 +6,15 @@ I used match in our project, and match regenerated the certificate when the proj
 ### Usage
 
 #### Example
+ In the example, 
+ ```
+fastlane hi_match_certs_migration
+ ```
+ select the app you wish to migration
  
+ ```
+fastlane hi_match readonly:false keychain_password:your_keychain_password
+ ```
 
 #### Others
 First of all, download the repo, drag the actions directory under your fastlane directory.
