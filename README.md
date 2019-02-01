@@ -5,6 +5,10 @@ I used match in our project, and match regenerated the certificate when the proj
 
 ### Usage
 
+#### Example
+ 
+
+#### Others
 First of all, download the repo, drag the actions directory under your fastlane directory.
 In your Fastfile, 
 
